@@ -48,6 +48,9 @@ This project aims to provide a comprehensive platform for monitoring and analyzi
 
 7. **Download Ship Report:**
    - Click "Save to CSV" to save the current data to a CSV file.
+  
+8. **GCP API Key:**
+   - In line 297 of the HTML file, input your own Google Cloud Platform (GCP) API key to enable the satellite imagery features.
 
 ## License
 
