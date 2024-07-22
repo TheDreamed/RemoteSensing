@@ -4,13 +4,13 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Remote Sensing Project</title>
-    <link rel="stylesheet" href="updated071724.css" />
+    <link rel="stylesheet" type="text/css" href="./styles/remoteSensingStyles.css" />
   </head>
   <body>
       <header>
         <div class="nav">
-          <img src="logoCAWIL.png" alt="Logo" />
-          <img src="nameCAWIL.png" alt="Name" />
+          <img src=".\img\logoCAWIL.png" alt="Logo" />
+          <img src=".\img\nameCAWIL.png" alt="Name" />
         </div>
       </header>
 
@@ -20,6 +20,7 @@
         <label for="vessel-select">Select Vessel:</label>
 
         <select id="vessel-select">
+          <option value="" disabled selected hidden>Upload CSV File...</option>
           <!-- Options will be populated dynamically -->
         </select>
 
@@ -264,7 +265,7 @@
               fill="white"
             />
           </svg>
-          Save to CSV
+          Download CSV report
         </button>
         </label>
         
@@ -286,7 +287,7 @@
       </div>
       <div id="map"></div>
       <div class="info-box" id="info-box">
-        <img src="Ship.jpg" alt="Vessel Image" id="vessel-image" />
+        <img src=".\img\shipImage.jpg" alt="Vessel Image" id="vessel-image" />
         <p id="vessel-info"></p>
       </div>
     </main>
@@ -294,7 +295,7 @@
       <p>&copy; 2024 Remote Sensing Dashboard Team</p>
     </footer>
     <script
-      src="https://maps.googleapis.com/maps/api/js?key=<YourApiKey>callback=initMap&libraries=maps,places"
+      src="https://maps.googleapis.com/maps/api/js?key=&callback=initMap&libraries=maps,places"
       async
       defer
     ></script>
@@ -310,7 +311,7 @@
         map = "google";
         googleMap = new google.maps.Map(document.getElementById("map"), {
           center: { lat: 0.9257590770721436, lng: 103.87956237792969 },
-          zoom: 2,
+          zoom: 3,
           mapId: "DEMO_MAP_ID",
         });
         console.log("Map initialized");
@@ -373,12 +374,13 @@
             });
           }
         }
+        
         document
           .getElementById("save-csv-button")
           .addEventListener("click", saveToCSV);
 
         function saveToCSV() {
-          // Assuming your infobox has an id or class, like "infobox"
+          // Call info box
           var infobox = document.getElementById("info-box");
           if (!infobox) {
             console.error("Infobox element not found!");
@@ -409,6 +411,7 @@
           link.click(); // This will download the data file named "vessel_information.csv"
           document.body.removeChild(link);
         }
+        
         // Populate vessel dropdown
         var vesselSelect = document.getElementById("vessel-select");
         vesselSelect.innerHTML = "";
@@ -420,6 +423,31 @@
         });
         console.log(vesselPath);
       }
+
+      vesselSearch = document.querySelector("#vessel_select");
+      var when = "keyup"; 
+
+      vesselSearch.addEventListener("keyup", function (e) {
+          var text = e.target.value; 
+          var options = vesselSearch.options; 
+          for (var i = 0; i < options.length; i++) {
+              var option = options[i]; 
+              var optionText = option.text; 
+              var lowerOptionText = optionText.toLowerCase();
+              var lowerText = text.toLowerCase(); 
+              var regex = new RegExp("^" + text, "i");
+              var match = optionText.match(regex); 
+              var contains = lowerOptionText.indexOf(lowerText) != -1;
+
+              timeout = setTimeout(function() { if (match || contains) {
+                  option.selected = true;
+                  return;
+              }}, 1000);
+
+              clearTimeout(timeout);
+              vesselSearch.selectedIndex = 0; 
+          }
+      });
 
       function applyVesselFilter() {
         var selectedVessel = document.getElementById("vessel-select").value;
@@ -444,7 +472,7 @@
           position: coordinates[0],
           map: googleMap,
           icon: {
-            url: "ship.png",
+            url: "./img/shipIcon.png",
             scaledSize: new google.maps.Size(32, 32), // Adjust this size to match your resized ship.png
           },
         });
@@ -484,9 +512,9 @@
         var infoBox = document.getElementById("info-box");
         var vesselInfo = document.getElementById("vessel-info");
         vesselInfo.innerHTML =
-          "Vessel: " +
-          point.vesselName +
-          "<br>Timestamp: " +
+          " <br>Vessel: <br>" +
+          point.vesselName + "<br>"+
+          "<br>Time: <br>" +
           new Date(point.timestamp).toLocaleString("en-US", {
             month: "long",
             day: "numeric",
@@ -494,11 +522,10 @@
             hour: "numeric",
             minute: "numeric",
             hour12: true,
-          }) +
-          "<br>ETA: " +
-          calculateETA(point.timestamp) +
-          "<br>Carbon Sink Estimation: " +
-          calculateCarbonSink();
+          }) + "<br>"+
+          "<br>ETA: 2 hours 2mins near port<br>" +
+          "<br>Carbon Sink: 1L / 100km<br>" + 
+          "<br>Coordinates<br>" + point.lat + ","+ point.lon;
         infoBox.style.display = "block";
 
         // Recalculate position of the info box
@@ -514,16 +541,6 @@
         });
 
         google.maps.event.trigger(googleMap, "bounds_changed");
-      }
-
-      function calculateETA(timestamp) {
-        // Dummy function for ETA calculation
-        return "ETA Placeholder";
-      }
-
-      function calculateCarbonSink() {
-        // Dummy function for carbon sink estimation
-        return "Carbon Sink Placeholder";
       }
 
       document
